@@ -40,7 +40,7 @@ sudo nano .config/lxsession/LXDE/autostart
 @chromium --noerrdialogs --kiosk http://www.42volt.de --incognito
 ```
 
-*First line disables screensaver,
-*second to fourth line disable power management settings and stop screen blanking after a period of inactivity 
-*fifth line prevents error messages displaying on the screen in the instance that someone accidentally power cycles the pi without going through the shutdown procedure
-*sixth line starts chromium and provides which page to load once it boots without error dialogs and in Kiosk mode
+* First line disables screensaver,
+* second to fourth line disable power management settings and stop screen blanking after a period of inactivity 
+* fifth line prevents error messages displaying on the screen in the instance that someone accidentally power cycles the pi without going through the shutdown procedure
+* sixth line starts chromium and provides which page to load once it boots without error dialogs and in Kiosk mode
