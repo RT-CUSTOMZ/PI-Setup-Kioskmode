@@ -45,7 +45,7 @@ sudo nano .config/lxsession/LXDE/autostart
 * fifth line prevents error messages displaying on the screen in the instance that someone accidentally power cycles the pi without going through the shutdown procedure
 * sixth line starts chromium and provides which page to load once it boots without error dialogs and in Kiosk mode
 
-## 7. save with 'CTRL + O' and exit with 'CTRL + X'
+## 7. save with `CTRL + O` and exit with `CTRL + X`
 
 ## 8. restart
 ```bash
