@@ -13,6 +13,8 @@ sudo apt-get upgrade
 ```bash
 sudo raspi-config
 ```
+choose autologin to desktop
+
 ## 3. install chromium and x11
 
 ```bash
@@ -24,10 +26,19 @@ sudo apt-get install chromium x11-xserver-utils
 sudo apt-get install unclutter
 ```
 
+
+
+
+## 8. stuff
+sudo apt-get install --no-install-recommends xserver-xorg
+sudo apt-get install --no-install-recommends xinit
+sudo apt-get install --no-install-recommends raspberrypi-ui-mods lxsession
+sudo apt-get install lightdm
+
 ## 5. edit/create file:
 ```bash
 mkdir .config/lxsession/LXDE/
-sudo nano .config/lxsession/LXDE/autostart
+nano .config/lxsession/LXDE/autostart
 ```
 
 ## 6. put into file: 
@@ -45,9 +56,12 @@ sudo nano .config/lxsession/LXDE/autostart
 * fifth line prevents error messages displaying on the screen in the instance that someone accidentally power cycles the pi without going through the shutdown procedure
 * sixth line starts chromium and provides which page to load once it boots without error dialogs and in Kiosk mode
 
-## 7. save with `CTRL + O` and exit with `CTRL + X`
+## 5. save with `CTRL + O` and exit with `CTRL + X`
 
-## 8. restart
+## 9. restart
 ```bash
 sudo reboot
 ```
+ssh-copy-id pi@192.168.120.232
+
+
