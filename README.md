@@ -15,40 +15,31 @@ sudo raspi-config
 ```
 choose autologin to desktop
 
-## 3. install chromium and x11
+## 3. install chromium, x11, ....., install unclutter (to remove cursor from screen)
 
 ```bash
 sudo apt-get install chromium x11-xserver-utils
-```
-
-## 4. install unclutter (to remove cursor from screen)
-```bash
-sudo apt-get install unclutter
-```
-
-
-
-
-## 8. stuff
 sudo apt-get install --no-install-recommends xserver-xorg
 sudo apt-get install --no-install-recommends xinit
 sudo apt-get install --no-install-recommends raspberrypi-ui-mods lxsession
 sudo apt-get install lightdm
-
-## 5. edit/create file:
-```bash
-mkdir .config/lxsession/LXDE/
-nano .config/lxsession/LXDE/autostart
+sudo apt-get install unclutter
 ```
 
-## 6. put into file: 
+## 4. edit/create file:
+```bash
+mkdir .config/lxsession/LXDE-pi/
+nano .config/lxsession/LXDE-pi/autostart
+```
+
+## 5. put into file: 
 ```bash
 @xscreensaver -no-splash
 @xset s off
 @xset -dpms
 @xset s noblank
 @sed -i 's/"exited_cleanly": false/"exited_cleanly": true/' ~/.config/chromium/Default/Preferences
-@chromium --noerrdialogs --kiosk http://www.42volt.de --incognito
+@chromium --noerrdialogs --kiosk http://bilder.campuswoche.de/viewer --incognito
 ```
 
 * First line disables screensaver,
@@ -62,6 +53,7 @@ nano .config/lxsession/LXDE/autostart
 ```bash
 sudo reboot
 ```
+## In order to not type the passwort each time for ssh:
 ssh-copy-id pi@192.168.120.232
 
 
