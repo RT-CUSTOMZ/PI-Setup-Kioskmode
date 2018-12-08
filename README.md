@@ -107,5 +107,11 @@ sudo chmod 755 xauth_root.sh
 ```bash
 sudo reboot
 ```
-# In order to not type the passwort each time for ssh:
+# SSH
+## Enable SSH on Raspberry Pi
+```bash
+sudo systemctl enable ssh
+sudo systemctl start ssh
+```
+##In order to not type the passwort each time for ssh:
 ssh-copy-id pi@[ip adresse]
