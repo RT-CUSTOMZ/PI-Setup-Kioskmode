@@ -113,5 +113,6 @@ sudo reboot
 sudo systemctl enable ssh
 sudo systemctl start ssh
 ```
-##In order to not type the passwort each time for ssh:
+
+## To not type the passwort each time for ssh:
 ssh-copy-id pi@[ip adresse]
