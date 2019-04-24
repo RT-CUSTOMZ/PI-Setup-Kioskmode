@@ -8,11 +8,13 @@
     kiosk_url: "http://coffee.42volt.de"
     wifi_ssid: "Unifi_FP"
     wifi_password: "testxamax"
+    
     ansible_become: yes
     ansible_become_method: su
     ansible_become_pass: raspberry
     ansible_python_interpreter: /usr/bin/python3
-  remote_user: "{{ user}}"
+  
+  remote_user: "{{ user }}"
   tasks:
     # - debug: var=ansible_facts
     - name: Set Hostname to {{ hostname }}
@@ -167,19 +169,19 @@
 #########################################################################################
 # lightdm autostart
 
-    - name: Create lxsession directory for User {{ user}} [Debian]
+    - name: Create lxsession directory for User {{ user }} [Debian]
       become: yes
-      become_user: "{{ user}}"
+      become_user: "{{ user }}"
       file:
-        path: "/home/{{ user}}/.config/lxsession/LXDE"
+        path: "/home/{{ user }}/.config/lxsession/LXDE"
         state: directory
       when: ansible_facts['architecture'] == "x86_64"
 
     - name: Create lxsession File [Debian]
       become: yes
-      become_user: "{{ user}}"
+      become_user: "{{ user }}"
       copy:
-        dest: "/home/{{ user}}/.config/lxsession/LXDE/autostart"
+        dest: "/home/{{ user }}/.config/lxsession/LXDE/autostart"
         content: |
           @xscreensaver -no-splash
           @xset s off
@@ -192,19 +194,19 @@
       register: lxsession_autostart
       when: ansible_facts['architecture'] == "x86_64"
 
-    - name: Create lxsession directory for User {{ user}} [Raspbian]
+    - name: Create lxsession directory for User {{ user }} [Raspbian]
       become: yes
-      become_user: "{{ user}}"
+      become_user: "{{ user }}"
       file:
-        path: "/home/{{ user}}/.config/lxsession/LXDE-pi"
+        path: "/home/{{ user }}/.config/lxsession/LXDE-pi"
         state: directory
       when: ansible_facts['architecture'] == "armv7l"    
 
     - name: Create lxsession File [Raspbian]
       become: yes
-      become_user: "{{ user}}"
+      become_user: "{{ user }}"
       copy:
-        dest: "/home/{{ user}}/.config/lxsession/LXDE-pi/autostart"
+        dest: "/home/{{ user }}/.config/lxsession/LXDE-pi/autostart"
         content: |
           @xscreensaver -no-splash
           @xset s off
@@ -226,16 +228,14 @@
 # configure Wifi
 
     - name: Create wpa_supplicant.conf File [Raspbian]
-      become: yes
-      become_user: "{{ user }}"
       copy:
         dest: "/etc/wpa_supplicant/wpa_supplicant.conf"
         content: |
-          # Datei wpa_supplicant.conf in der Boot-Partition (Raspbian Stretch)
           network={
-            ssid="{{wifi_ssid}}"
-            psk="{{wifi_password}}"
+          ssid="{{wifi_ssid}}"
+          psk="{{wifi_password}}"
           }
+        mode: u=rwX,g=rX,o=rX
       register: configure_wifi
       when: ansible_facts['architecture'] == "armv7l"
 
