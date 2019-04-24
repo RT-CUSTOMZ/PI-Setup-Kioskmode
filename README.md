@@ -10,8 +10,12 @@ sudo systemctl start ssh
 ssh-copy-id pi@[IP-Address]
 
 # Setup with ansible
-There are two versions available:
-one version with the 
+
+# 1. Install Ansible on your localhost
+# 2. Ensure ssh connection with the above command (check with ssh pi@[IP-Address] if you have to type a password)
+# 3. Add IP Adress to your inventory (/etc/ansible/hosts)
+
+The Skript can be used for Debian 9 and Raspbian installations 
 ```bash
 ansible-playbook <File_Name> -i <IP-Address-of-PI>
 ```
