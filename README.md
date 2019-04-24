@@ -1,6 +1,26 @@
-# PI-Setup-Kioskmode-Campuswoche
 
-## 1.  update packages
+# SSH
+## Enable SSH on Raspberry Pi
+```bash
+sudo systemctl enable ssh
+sudo systemctl start ssh
+```
+
+## To not type the passwort each time for ssh make a copy-id on your localhost:
+ssh-copy-id pi@[IP-Address]
+
+# Setup with ansible
+There are two versions available:
+one version with the 
+```bash
+ansible-playbook <File_Name> -i <IP-Address-of-PI>
+```
+
+# Manual Setup
+
+## PI-Setup-Kioskmode-Campuswoche
+
+### 1.  update packages
 
 ```bash
 sudo apt-get update
@@ -9,13 +29,13 @@ sudo apt-get upgrade
 ```
 
 
-## 2.  configurate pi, wifi credencials, ssh, keyboard layout etc.
+### 2.  Configurate pi, wifi credencials, ssh, keyboard layout etc.
 ```bash
 sudo raspi-config
 ```
 choose autologin to desktop
 
-## 3. install chromium, x11, ....., install unclutter (to remove cursor from screen)
+### 3. Install Packages
 
 ```bash
 sudo apt-get install chromium x11-xserver-utils
@@ -27,13 +47,13 @@ sudo apt-get install unclutter
 sudo apt-get install xdotool
 ```
 
-## 4. edit/create file:
+### 4. Edit/create Autostart file:
 ```bash
 mkdir .config/lxsession/LXDE-pi/
 nano .config/lxsession/LXDE-pi/autostart
 ```
 
-## 5. Input the following and save afterwards with `CTRL + O` and exit with `CTRL + X`
+### 5. Autostartfile input
 ```bash
 @xscreensaver -no-splash
 @xset s off
@@ -50,11 +70,12 @@ nano .config/lxsession/LXDE-pi/autostart
 * fifth line prevents error messages displaying on the screen in the instance that someone accidentally power cycles the pi without going through the shutdown procedure
 * sixth line starts chromium and provides which page to load once it boots without error dialogs and in Kiosk mode
 
-## 7. Create and open /home/pi/autorefresh-chromium.sh
+### 7. Autorefresh skript [optional]
+Create and open /home/pi/autorefresh-chromium.sh
 ```bash
 sudo nano /home/pi/autorefresh-chromium.sh
 ```
-## 8. Input the following
+Input the following:
 ```bash
 #!/bin/bash
 
@@ -79,16 +100,16 @@ do
   sleep 1200 #refresh time in seconds so 1200 = every 20 min
 done
 ```
-## 9. Make File executable
+### 8. Make File executable
 ```bash
 sudo chmod 755 /home/pi/autorefresh-chromium.sh
 ```
 
-## 10. Create and open /home/pi/xauth_root.sh
+### 9. Create and open /home/pi/xauth_root.sh
 ```bash
 sudo nano /home/pi/xauth_root.sh
 ```
-## 11. Input the following
+Input the following:
 ```bash
 #!/bin/bash
 
@@ -99,20 +120,12 @@ touch /root/.Xauthority
 xauth merge /home/pi/.Xauthority
 export XAUTHORITY=/root/.Xauthority
 ```
-## 12. Make File executable
+## 10. Make File executable
 ```bash
 sudo chmod 755 xauth_root.sh
 ```
-## 13. restart
+## 11. restart
 ```bash
 sudo reboot
 ```
-# SSH
-## Enable SSH on Raspberry Pi
-```bash
-sudo systemctl enable ssh
-sudo systemctl start ssh
-```
 
-## To not type the passwort each time for ssh:
-ssh-copy-id pi@[ip adresse]

@@ -1,0 +1,246 @@
+## Tested with Debian 9 and Raspbian Stretch
+---
+- name: Configuration for digital-signage
+  hosts: all
+  vars:
+    user: pi
+    hostname: digital-signage
+    kiosk_url: "http://coffee.42volt.de"
+    ansible_become: yes
+    ansible_become_method: su
+    ansible_become_pass: raspberry
+    ansible_python_interpreter: /usr/bin/python3
+  remote_user: "{{ user}}"
+  tasks:
+    - debug: var=ansible_facts
+    - name: Set Hostname to {{ hostname }}
+      hostname:
+        name: "{{ hostname }}"
+
+    - name: Update and upgrade apt packages 
+      apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400 #One day
+
+#########################################################################################
+#Choose Chrome Version depending on distribution
+
+    - name: Install chromium
+      apt:
+        
+        name: 
+          - chromium
+        state: latest
+      when: ansible_facts['architecture'] == "x86_64"  
+
+    - name: install chromium-browser
+      apt:
+        name: 
+          - chromium-browser
+        state: latest
+      when: ansible_facts['architecture'] == "armv7l"
+
+#########################################################################################
+
+    - name: Install unclutter
+      apt:
+        name: 
+          - unclutter 
+        state: latest
+
+    - name: Install x11-xserver-utils
+      apt:
+        name: 
+          - x11-xserver-utils 
+        state: latest
+
+    - name: Install --no-install-recommends xserver-xorg
+      apt:
+        name: 
+          - xserver-xorg
+        install_recommends: no
+        state: latest
+
+    - name: Install xinit
+      apt:
+        name: 
+          - xinit
+        install_recommends: no
+        state: latest
+
+    - name: Install raspberrypi-ui-mods lxsession
+      apt:
+        name: 
+          - raspberrypi-ui-mods 
+          - lxsession
+        install_recommends: no
+        state: latest
+      when: ansible_facts['architecture'] == "armv7l"
+
+    - name: Install lightdm
+      apt:
+        name:  
+          - lightdm
+        state: latest
+
+    - name: Install xdotool
+      apt:
+        name: 
+          - xdotool 
+        state: latest
+
+
+#########################################################################################
+# lightdm autologin
+
+    - name: Creates directory /etc/lightdm/lightdm.conf.d
+      file:
+        path: /etc/lightdm/lightdm.conf.d
+        state: directory
+
+    - name: Create autologin file
+      copy:
+        dest: /etc/lightdm/lightdm.conf.d/01_autologin.conf
+        content: |
+          [Seat:*]
+          autologin-user={{ user }}
+          autologin-user-timeout=0
+
+#########################################################################################
+# Autorefresh
+
+    - name: Create Autorefresh File
+      become: yes
+      become_user: "{{ user }}"
+      copy:
+        dest: "/home/{{ user }}/autorefresh-chromium.sh"
+        content: |
+          #!/bin/bash
+          # also see instructions here: https://www.raspberrypi.org/forums/viewtopic.php?t=178206#p1239241
+          #
+          # To make this run with sudo (which is the case when run at boot), execute "xauth_root.sh" before running this script.
+          #
+          # xdotools setup instructions found here: http://theembeddedlab.com/tutorials/simulate-keyboard-mouse-events-xdotool-raspberry-pi/
+          #
+          # This will only set up the DISPLAY variable for one command
+          DISPLAY=:0 xdotool key "ctrl+F5"
+          # This will set up the DISPLAY variable for every command executed on this terminal,
+          # and child processes spawned from this terminal
+          export DISPLAY=:0
+
+          while true; #create an infinite loop
+          do
+            xdotool key "ctrl+F5" &
+            sleep 1200 #refresh time in seconds so 1200 = every 20 min
+          done
+
+    - name: Changing perm of "/home/{{ user }}/autorefresh-chromium.sh", adding "+x"
+      file: 
+        path: /home/{{ user }}/autorefresh-chromium.sh
+        mode: u=rwX,g=rX,o=rX
+ 
+#########################################################################################
+# xauth_root.sh
+
+    - name: Create xauth_root.sh File
+      become: yes
+      become_user: "{{ user }}"
+      copy:
+        dest: "/home/{{ user }}/xauth_root.sh"
+        content: |
+          #!/bin/bash
+          #
+          # source: https://raspberrypi.stackexchange.com/questions/1719/x11-connection-rejected-because-of-wrong-authentication
+          #
+          touch /root/.Xauthority
+          xauth merge /home/pi/.Xauthority
+          export XAUTHORITY=/root/.Xauthority
+
+    - name: Changing perm of "/home/{{ user }}/xauth_root.sh", adding "+x"
+      file:
+        path: /home/{{ user }}/xauth_root.sh
+        mode: u=rwX,g=rX,o=rX
+
+#########################################################################################
+# lightdm autostart
+
+    - name: Create lxsession directory for User {{ user}}
+      become: yes
+      become_user: "{{ user}}"
+      file:
+        path: "/home/{{ user}}/.config/lxsession/LXDE"
+        state: directory
+      when: ansible_facts['architecture'] == "x86_64"
+
+    - name: Create lxsession File
+      become: yes
+      become_user: "{{ user}}"
+      copy:
+        dest: "/home/{{ user}}/.config/lxsession/LXDE/autostart"
+        content: |
+          @xscreensaver -no-splash
+          @xset s off
+          @xset -dpms
+          @xset s noblank
+          @sed -i 's/"exited_cleanly": false/"exited_cleanly": true/' ~/.config/chromium/Default/Preferences
+          @chromium --noerrdialogs --kiosk {{ kiosk_url }} --incognito
+          @/home/pi/xauth_root.sh
+          @/home/pi/autorefresh-chromium.sh
+      register: lxsession_autostart
+      when: ansible_facts['architecture'] == "x86_64"
+
+    - name: Create lxsession directory for User {{ user}}
+      become: yes
+      become_user: "{{ user}}"
+      file:
+        path: "/home/{{ user}}/.config/lxsession/LXDE-pi"
+        state: directory
+      when: ansible_facts['architecture'] == "armv7l"    
+
+    - name: Create lxsession File
+      become: yes
+      become_user: "{{ user}}"
+      copy:
+        dest: "/home/{{ user}}/.config/lxsession/LXDE-pi/autostart"
+        content: |
+          @xscreensaver -no-splash
+          @xset s off
+          @xset -dpms
+          @xset s noblank
+          @sed -i 's/"exited_cleanly": false/"exited_cleanly": true/' ~/.config/chromium/Default/Preferences
+          @chromium-browser --noerrdialogs --kiosk {{ kiosk_url }} --incognito
+          @/home/pi/xauth_root.sh
+          @/home/pi/autorefresh-chromium.sh
+      register: lxsession_autostart
+      when: ansible_facts['architecture'] == "armv7l"
+
+
+    - name: Restart after configuration change
+      reboot:
+      when: lxsession_autostart.changed
+
+#########################################################################################
+# configure Wifi
+
+    - name: Create wpa_supplicant.conf File
+      become: yes
+      become_user: "{{ user }}"
+      copy:
+        dest: "/home/{{ user}}/wpa_supplicant.conf"
+        content: |
+          # Datei wpa_supplicant.conf in der Boot-Partition (Raspbian Stretch)
+          country=DE
+          ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+          update_config=1
+          network={
+            ssid="Unifi_FP"
+            psk="testxamax"
+            key_mgmt=WPA-PSK
+          }
+      register: configure_wifi
+      when: ansible_facts['architecture'] == "armv7l"
+
+    - name: Restart after Wifi configuration change
+      reboot:
+      when: configure_wifi.changed
