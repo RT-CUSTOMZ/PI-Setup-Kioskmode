@@ -6,7 +6,9 @@ sudo systemctl enable ssh
 sudo systemctl start ssh
 ```
 
-## To not type the passwort each time for ssh make a copy-id on your localhost:
+## SSH on localhost
+To not type the passwort each time for ssh make a copy-id on your localhost:
+ssh pi@[IP-Address]
 ssh-copy-id pi@[IP-Address]
 
 # Setup with ansible
