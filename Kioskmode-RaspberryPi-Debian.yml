@@ -6,8 +6,8 @@
     user: pi
     hostname: digital-signage
     kiosk_url: "http://coffee.42volt.de"
-    wifi_ssid: "Unifi_FP"
-    wifi_password: "testxamax"
+    wifi_ssid: "RT-Labor-1"
+    wifi_password: "hardies42"
     
     ansible_become: yes
     ansible_become_method: su
@@ -231,6 +231,9 @@
       copy:
         dest: "/etc/wpa_supplicant/wpa_supplicant.conf"
         content: |
+          ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev 
+          update_config=1
+
           network={
           ssid="{{wifi_ssid}}"
           psk="{{wifi_password}}"

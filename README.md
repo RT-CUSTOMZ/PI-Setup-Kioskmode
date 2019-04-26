@@ -1,62 +1,94 @@
+# Setup with Ansible
 
-# SSH
-## Enable SSH on Raspberry Pi
+## 1. Install Ansible on your localhost
+## 2. Ensure ssh connection 
+
+Linux Terminal on configuring PC:
 ```bash
-sudo systemctl enable ssh
-sudo systemctl start ssh
+# In order to not type in the Password every time:
+$ ssh-copy-id pi@[IP-Address]
+# Verify that it worked
+$ ssh pi@[IP-Address]
 ```
 
-## SSH on localhost
-To not type the passwort each time for ssh make a copy-id on your localhost:
-ssh pi@[IP-Address]
-ssh-copy-id pi@[IP-Address]
+### 3.1. Add IP Adress to your inventory (/etc/ansible/hosts)
 
-# Setup with ansible
+The Skript can be used for Debian 9 and Raspbian installations.
 
-# 1. Install Ansible on your localhost
-# 2. Ensure ssh connection with the above command (check with ssh pi@[IP-Address] if you have to type a password)
-# 3. Add IP Adress to your inventory (/etc/ansible/hosts)
-
-The Skript can be used for Debian 9 and Raspbian installations 
+Please note that the -i flag only accepts a comma separated list of arguments(ip-addresses), thus the double quotes and the trailing comma. 
 ```bash
-ansible-playbook <File_Name> -i <IP-Address-of-PI>
+$ ansible-playbook <File_Name> -i "<IP-Address-of-PI>,"
+```
+### 3.2 Using Inventory
+Instead of using the -i flag the default inventory file /etc/ansible/hosts can be used.
+
+
+```bash
+# IP without any group
+192.168.120.144
+
+[group_name_1]
+192.168.120.48
+192.168.120.77
+
+[group_name_2]
+192.168.120.77 #same IP linke in Group group_name_1
+192.168.120.79
+192.168.120.119
 ```
 
+```bash
+$ ansible-playbook <File_Name>
+# or with a group
+$ ansible-playbook <File_Name> -l group_name_1
+```
 # Manual Setup
 
 ## PI-Setup-Kioskmode-Campuswoche
 
-### 1.  update packages
+# SSH
+
+## Preparations: 
+
+1. Install Raspbian on the PI
+2. Enable SSH on Raspberry Pi:
 
 ```bash
-sudo apt-get update
+$ sudo systemctl enable ssh
+$ sudo systemctl start ssh
+```
+##Setup:
+### 1.  Update packages
 
-sudo apt-get upgrade
+```bash
+$ sudo apt-get update
+
+$ sudo apt-get upgrade
 ```
 
 
 ### 2.  Configurate pi, wifi credencials, ssh, keyboard layout etc.
 ```bash
-sudo raspi-config
+$ sudo raspi-config
 ```
 choose autologin to desktop
 
 ### 3. Install Packages
 
 ```bash
-sudo apt-get install chromium x11-xserver-utils
-sudo apt-get install --no-install-recommends xserver-xorg
-sudo apt-get install --no-install-recommends xinit
-sudo apt-get install --no-install-recommends raspberrypi-ui-mods lxsession
-sudo apt-get install lightdm
-sudo apt-get install unclutter
-sudo apt-get install xdotool
+$ sudo apt-get install chromium x11-xserver-utils
+$ sudo apt-get install --no-install-recommends xserver-xorg
+$ sudo apt-get install --no-install-recommends xinit
+$ sudo apt-get install --no-install-recommends raspberrypi-ui-mods lxsession
+$ sudo apt-get install lightdm
+$ sudo apt-get install unclutter
+$ sudo apt-get install xdotool
 ```
 
 ### 4. Edit/create Autostart file:
 ```bash
-mkdir .config/lxsession/LXDE-pi/
-nano .config/lxsession/LXDE-pi/autostart
+$ mkdir .config/lxsession/LXDE-pi/
+$ nano .config/lxsession/LXDE-pi/autostart
 ```
 
 ### 5. Autostartfile input
@@ -79,7 +111,7 @@ nano .config/lxsession/LXDE-pi/autostart
 ### 7. Autorefresh skript [optional]
 Create and open /home/pi/autorefresh-chromium.sh
 ```bash
-sudo nano /home/pi/autorefresh-chromium.sh
+$ sudo nano /home/pi/autorefresh-chromium.sh
 ```
 Input the following:
 ```bash
@@ -108,12 +140,12 @@ done
 ```
 ### 8. Make File executable
 ```bash
-sudo chmod 755 /home/pi/autorefresh-chromium.sh
+$ sudo chmod 755 /home/pi/autorefresh-chromium.sh
 ```
 
 ### 9. Create and open /home/pi/xauth_root.sh
 ```bash
-sudo nano /home/pi/xauth_root.sh
+$ sudo nano /home/pi/xauth_root.sh
 ```
 Input the following:
 ```bash
@@ -128,10 +160,10 @@ export XAUTHORITY=/root/.Xauthority
 ```
 ## 10. Make File executable
 ```bash
-sudo chmod 755 xauth_root.sh
+$ sudo chmod 755 xauth_root.sh
 ```
-## 11. restart
+## 11. Restart
 ```bash
-sudo reboot
+$ sudo reboot
 ```
 
